@@ -656,7 +656,7 @@ def diagnose_issue(item: Dict[str, str]) -> Tuple[str, str]:
         if url.endswith("/sitemap.xml"):
             return (
                 "Sitemap dosyasi bulunamiyor.",
-                "Shopify'da dogru domaini primary yap. Ardindan /sitemap.xml aciliyor mu kontrol et ve Search Console'a gonder.",
+                "Dogru domaini primary olarak ayarla. Ardindan /sitemap.xml aciliyor mu kontrol et ve Search Console'a gonder.",
             )
         return (
             "URL bulunamiyor (404).",
