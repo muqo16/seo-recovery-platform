@@ -1,5 +1,9 @@
-# SEO Recovery Platform
-![SEO Recovery Cover](assets/github-cover.svg)
+<p align="center">
+  <img src="assets/github-cover.svg" alt="SEO Recovery Platform Cover" width="100%" />
+</p>
+
+<h1 align="center">SEO Recovery Platform</h1>
+<p align="center">Migration Sonrasi Trafik Kaybini Gor, Duzelt, Toparla</p>
 
 Ikas -> Shopify gibi platform gecislerinden sonra kaybolan SEO performansini hizli tespit etmek, aksiyona donusturmek ve toparlanmayi izlemek icin gelistirilmis FastAPI tabanli analiz uygulamasi.
 
