@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEO Recovery Sonuc</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>Analiz Sonucu</h1>
+      <p>
+        {% if analysis_mode == "migration" %}
+          Gecis karsilastirma modu ozeti.
+        {% else %}
+          Site tarama modu ozeti.
+        {% endif %}
+      </p>
+      <a class="back-link" href="/">Yeni analiz yap</a>
+    </section>
+
+    <section class="panel stats">
+      <div class="stat">
+        <span>Toplam eski URL</span>
+        <strong>{{ summary.total_old_urls }}</strong>
+      </div>
+      <div class="stat">
+        <span>Otomatik eslesen</span>
+        <strong>{{ summary.auto_matched }}</strong>
+      </div>
+      <div class="stat">
+        <span>Manual gerekli</span>
+        <strong>{{ summary.manual_required }}</strong>
+      </div>
+      <div class="stat">
+        <span>Kritik teknik hata</span>
+        <strong>{{ critical_issues }}</strong>
+      </div>
+    </section>
+
+    {% if analysis_mode == "migration" %}
+      <section class="panel">
+        <h2>Export Dosyalari</h2>
+        <div class="actions">
+          <a href="/download/{{ job_id }}/redirects.csv">redirects.csv indir</a>
+          <a href="/download/{{ job_id }}/manual.csv">manual_review.csv indir</a>
+          <a href="/download/{{ job_id }}/comparison.csv">comparison.csv indir</a>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if recovery_panel %}
+      <section class="panel stats">
+        {% for card in recovery_panel %}
+          <div class="stat">
+            <span>{{ card.day }} Gun Toparlanma (Tahmini)</span>
+            <strong>%{{ card.recovery_rate }}</strong>
+            <span>Toparlaniyor: {{ card.recovering_count }} | Toparlanmadi: {{ card.unresolved_count }}</span>
+          </div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    <section class="panel">
+      <h2>
+        {% if analysis_mode == "migration" %}
+          Ilk 20 Acil Aksiyon
+        {% else %}
+          Ilk 20 Acil SEO Sorunu
+        {% endif %}
+      </h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Etki Skoru</th>
+              <th>URL</th>
+              <th>Hedef/Final URL</th>
+              <th>Skor/Status</th>
+              <th>Neden</th>
+              <th>Hata Sebebi</th>
+              <th>Nasil Duzeltilir</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in urgent_actions %}
+              <tr>
+                <td>{{ row.impact }}</td>
+                <td>{{ row.old_url }}</td>
+                <td>{{ row.new_url }}</td>
+                <td>{{ row.score }}</td>
+                <td>{{ row.reason }}</td>
+                <td>{{ row.cause }}</td>
+                <td>{{ row.fix }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {% if analysis_mode == "migration" %}
+      <section class="panel">
+        <h2>URL Eslestirme Ornegi (ilk 100)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Eski URL</th>
+                <th>Yeni URL</th>
+                <th>Skor</th>
+                <th>Neden</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in matches %}
+                <tr>
+                  <td>{{ row.old_url }}</td>
+                  <td>{{ row.new_url }}</td>
+                  <td>{{ row.score }}</td>
+                  <td>{{ row.reason }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if comparison_rows %}
+      <section class="panel">
+        <h2>Duzeltme Once/Sonra Kiyas Raporu</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Eski URL</th>
+                <th>Yeni URL</th>
+                <th>Once Tiklama</th>
+                <th>Sonra Tiklama</th>
+                <th>Tiklama Delta</th>
+                <th>Once Pozisyon</th>
+                <th>Sonra Pozisyon</th>
+                <th>Pozisyon Delta</th>
+                <th>Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in comparison_rows %}
+                <tr>
+                  <td>{{ row.old_url }}</td>
+                  <td>{{ row.new_url }}</td>
+                  <td>{{ row.before_clicks }}</td>
+                  <td>{{ row.after_clicks }}</td>
+                  <td>{{ row.click_delta }}</td>
+                  <td>{{ row.before_position }}</td>
+                  <td>{{ row.after_position }}</td>
+                  <td>{{ row.position_delta }}</td>
+                  <td>
+                    {% if row.status == "toparlaniyor" or row.status == "yeni_toparlaniyor" %}
+                      <span class="badge-ok">{{ row.status }}</span>
+                    {% elif row.status == "duzeltildi_ama_toparlanmadi" %}
+                      <span class="badge-warn">{{ row.status }}</span>
+                    {% else %}
+                      <span class="badge-neutral">{{ row.status }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if unresolved_rows %}
+      <section class="panel">
+        <h2>Duzeltildi Ama Toparlanmadi URL Listesi</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Eski URL</th>
+                <th>Yeni URL</th>
+                <th>Kayip Tiklama</th>
+                <th>Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in unresolved_rows %}
+                <tr>
+                  <td>{{ row.old_url }}</td>
+                  <td>{{ row.new_url }}</td>
+                  <td>{{ row.lost_clicks }}</td>
+                  <td><span class="badge-warn">{{ row.status }}</span></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if run_audit %}
+      <section class="panel">
+        <h2>Teknik Audit Sonucu{% if site_url %} ({{ site_url }}){% endif %}</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>URL</th>
+                <th>Status</th>
+                <th>Seviye</th>
+                <th>Sorunlar</th>
+                <th>Canonical</th>
+                <th>Hata Sebebi</th>
+                <th>Nasil Duzeltilir</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in audit_results %}
+                <tr>
+                  <td>{{ row.url }}</td>
+                  <td>{{ row.status_code }}</td>
+                  <td>{{ row.severity }}</td>
+                  <td>{{ row.issues }}</td>
+                  <td>{{ row.canonical }}</td>
+                  <td>{{ row.cause }}</td>
+                  <td>{{ row.fix }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endif %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B3A23"/>
+      <stop offset="1" stop-color="#1F7A45"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.06"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <circle cx="1080" cy="110" r="220" fill="#9FE4BC" fill-opacity="0.12"/>
+  <circle cx="180" cy="520" r="240" fill="#B4F1CF" fill-opacity="0.08"/>
+
+  <rect x="64" y="80" width="1152" height="480" rx="28" fill="url(#panel)" stroke="#D6F4E1" stroke-opacity="0.24"/>
+
+  <g opacity="0.9">
+    <rect x="120" y="430" width="230" height="12" rx="6" fill="#DFF8EA"/>
+    <rect x="120" y="455" width="420" height="12" rx="6" fill="#C5EED6"/>
+    <rect x="120" y="480" width="380" height="12" rx="6" fill="#AEE6C5"/>
+  </g>
+
+  <g>
+    <path d="M770 450H1130" stroke="#C9F1D9" stroke-width="8" stroke-linecap="round"/>
+    <path d="M810 420L850 380L905 410L965 340L1030 370L1095 300" stroke="#E7FFF1" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="850" cy="380" r="10" fill="#E7FFF1"/>
+    <circle cx="905" cy="410" r="10" fill="#E7FFF1"/>
+    <circle cx="965" cy="340" r="10" fill="#E7FFF1"/>
+    <circle cx="1030" cy="370" r="10" fill="#E7FFF1"/>
+    <circle cx="1095" cy="300" r="10" fill="#E7FFF1"/>
+  </g>
+
+  <text x="120" y="190" fill="#ECFFF4" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">
+    SEO Recovery Platform
+  </text>
+  <text x="120" y="250" fill="#D8F7E6" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="500">
+    Ikas -> Shopify gecislerinde
+  </text>
+  <text x="120" y="292" fill="#D8F7E6" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="500">
+    trafik kaybini hizli tespit et, duzelt, toparla.
+  </text>
+
+  <rect x="120" y="332" width="360" height="56" rx="28" fill="#E8FFF3"/>
+  <text x="156" y="368" fill="#0F4A2D" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">
+    Teknik Audit + Redirect Export
+  </text>
+</svg>

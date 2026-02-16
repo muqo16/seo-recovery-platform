@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEO Recovery Platform</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>SEO Recovery Platform</h1>
+      <p>
+        Program, marka ve model bazli urun yapisini koruyarak gecis sonrasi SEO kaybini hizli tespit eder.
+        URL eslestirme, redirect export, teknik tarama ve onceliklendirilmis aksiyon listesi ile
+        organik trafik toparlama surecini hizlandirir.
+      </p>
+    </section>
+
+    {% if errors %}
+      <section class="panel error">
+        <h2>Hata Listesi</h2>
+        <ul>
+          {% for error in errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    <section class="panel">
+      <form id="analyze-form" action="/analyze" method="post" enctype="multipart/form-data">
+        <h2>1) Gecis Karsilastirma Modu (CSV)</h2>
+        <label>Eski URL dosyasi (CSV, `url` zorunlu)</label>
+        <input type="file" name="old_urls" accept=".csv" />
+
+        <label>Yeni URL dosyasi (CSV, `url` zorunlu)</label>
+        <input type="file" name="new_urls" accept=".csv" />
+
+        <label>GSC Once (opsiyonel CSV: `url,clicks,impressions,position`)</label>
+        <input type="file" name="gsc_before_pages" accept=".csv" />
+
+        <label>GSC Sonra (opsiyonel CSV: `url,clicks,impressions,position`)</label>
+        <input type="file" name="gsc_after_pages" accept=".csv" />
+
+        <label>Eski format GSC sayfa verisi (opsiyonel)</label>
+        <input type="file" name="gsc_pages" accept=".csv" />
+
+        <h2>2) Site Tarama Modu (URL ile otomatik)</h2>
+        <label>Site URL (ornek: magaza.com)</label>
+        <input type="text" name="site_url" placeholder="ornek: magaza.com" />
+
+        <div class="row">
+          <label class="checkbox">
+            <input type="checkbox" name="crawl_site" value="true" />
+            Siteyi otomatik tara (sitemap + ic linklerden URL bul)
+          </label>
+        </div>
+
+        <label>Tarama URL limiti (10-2000)</label>
+        <input type="number" name="crawl_limit" min="10" max="2000" value="200" />
+
+        <div class="row">
+          <label class="checkbox">
+            <input type="checkbox" name="run_audit" value="true" />
+            Teknik audit calistir (404/noindex/canonical)
+          </label>
+        </div>
+
+        <label>Audit URL limiti (1-500)</label>
+        <input type="number" name="audit_limit" min="1" max="500" value="150" />
+
+        <div class="actions">
+          <button id="submit-btn" type="submit">Analizi Baslat</button>
+          <button id="cancel-btn" type="button" class="secondary" hidden>Iptal Et</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <div id="loading-overlay" class="loading-overlay" aria-live="polite" aria-hidden="true">
+    <div class="loading-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <h3>Analiz Ediliyor</h3>
+      <p id="loading-message">Hazirlaniyor...</p>
+      <p id="loading-eta" class="loading-eta">Tahmini kalan sure: hesaplanıyor...</p>
+      <div class="progress-wrap" aria-hidden="true">
+        <div id="loading-progress-bar" class="progress-bar"></div>
+      </div>
+      <p id="loading-percent" class="loading-percent">%0</p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById("analyze-form");
+      const overlay = document.getElementById("loading-overlay");
+      const submitBtn = document.getElementById("submit-btn");
+      const cancelBtn = document.getElementById("cancel-btn");
+      const loadingMessage = document.getElementById("loading-message");
+      const loadingEta = document.getElementById("loading-eta");
+      const loadingPercent = document.getElementById("loading-percent");
+      const loadingProgressBar = document.getElementById("loading-progress-bar");
+      const asyncEnabled = {{ 'true' if flags['ASYNC_ANALYSIS'] else 'false' }};
+      const cancelEnabled = {{ 'true' if flags['CANCEL_JOB'] else 'false' }};
+      if (!form || !overlay || !submitBtn || !loadingMessage || !loadingPercent || !loadingProgressBar || !loadingEta || !cancelBtn) return;
+
+      let currentJobId = null;
+
+      function formatEta(seconds) {
+        if (seconds === null || seconds === undefined || Number(seconds) <= 0) return "Tamamlanmak uzere...";
+        const sec = Number(seconds);
+        if (sec < 60) return sec + " sn";
+        const min = Math.floor(sec / 60);
+        const rem = sec % 60;
+        return min + " dk " + rem + " sn";
+      }
+
+      function setProgress(percent, message, etaSeconds) {
+        const p = Math.max(0, Math.min(100, Number(percent) || 0));
+        loadingProgressBar.style.width = p + "%";
+        loadingPercent.textContent = "%" + p;
+        loadingMessage.textContent = message || "Analiz suruyor...";
+        loadingEta.textContent = "Tahmini kalan sure: " + formatEta(etaSeconds);
+      }
+
+      async function waitForCompletion(jobId) {
+        while (true) {
+          const resp = await fetch("/analyze/status/" + jobId, { method: "GET" });
+          if (!resp.ok) {
+            throw new Error("Durum bilgisi alinamadi.");
+          }
+          const data = await resp.json();
+          setProgress(data.progress || 0, data.message || "Analiz suruyor...", data.eta_seconds);
+
+          if (data.status === "done") {
+            setProgress(100, "Tamamlandi. Sonuc sayfasi aciliyor...", 0);
+            window.location.href = data.result_url || ("/result/" + jobId);
+            return;
+          }
+          if (data.status === "error") {
+            throw new Error(data.error || "Analiz tamamlanamadi.");
+          }
+          if (data.status === "cancelled") {
+            throw new Error("Analiz iptal edildi.");
+          }
+          await new Promise((resolve) => setTimeout(resolve, 900));
+        }
+      }
+
+      form.addEventListener("submit", async function (event) {
+        if (!asyncEnabled) return;
+        event.preventDefault();
+        overlay.classList.add("active");
+        overlay.setAttribute("aria-hidden", "false");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Analiz Suruyor...";
+        cancelBtn.hidden = !cancelEnabled;
+        cancelBtn.disabled = false;
+        setProgress(5, "Analiz siraya aliniyor...", null);
+
+        try {
+          const formData = new FormData(form);
+          const startResp = await fetch("/analyze/start", {
+            method: "POST",
+            body: formData
+          });
+          if (!startResp.ok) {
+            throw new Error("Analiz baslatilamadi.");
+          }
+          const startData = await startResp.json();
+          if (!startData.job_id) {
+            throw new Error("Islem kimligi alinamadi.");
+          }
+          currentJobId = startData.job_id;
+          await waitForCompletion(startData.job_id);
+        } catch (error) {
+          overlay.classList.remove("active");
+          overlay.setAttribute("aria-hidden", "true");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Analizi Baslat";
+          cancelBtn.hidden = true;
+          currentJobId = null;
+          alert((error && error.message) ? error.message : "Beklenmeyen bir hata olustu.");
+        }
+      });
+
+      cancelBtn.addEventListener("click", async function () {
+        if (!currentJobId || !cancelEnabled) return;
+        cancelBtn.disabled = true;
+        try {
+          await fetch("/analyze/cancel/" + currentJobId, { method: "POST" });
+        } catch (err) {
+          cancelBtn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

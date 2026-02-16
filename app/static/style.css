@@ -1,0 +1,276 @@
+:root {
+  --bg: #f4f7f5;
+  --card: #ffffff;
+  --line: #dbe5de;
+  --text: #17211b;
+  --muted: #5f7467;
+  --accent: #145a32;
+  --accent-soft: #e7f3eb;
+  --danger: #8f1d1d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top right, #dceee2, var(--bg));
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  width: min(1100px, 94vw);
+  margin: 28px auto 42px;
+}
+
+.hero h1 {
+  margin: 0 0 8px 0;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+form {
+  display: grid;
+  gap: 10px;
+}
+
+label {
+  font-size: 0.92rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+button {
+  width: fit-content;
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.secondary {
+  background: #e8efe9;
+  color: #1f3328;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.stat {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--accent-soft);
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.3rem;
+}
+
+.actions {
+  display: flex;
+  gap: 14px;
+}
+
+.actions a,
+.back-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  border: 1px solid var(--line);
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f0f6f2;
+}
+
+.error {
+  border-color: #edc3c3;
+  background: #fef2f2;
+}
+
+.error li {
+  color: var(--danger);
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 22, 16, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.loading-overlay.active {
+  display: flex;
+}
+
+.loading-card {
+  width: min(420px, 92vw);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(14, 39, 25, 0.22);
+  text-align: center;
+}
+
+.loading-card h3 {
+  margin: 8px 0 6px;
+}
+
+.loading-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.loading-eta {
+  margin-top: 4px !important;
+  font-size: 0.9rem;
+}
+
+.progress-wrap {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e6efe9;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #145a32, #29a35f);
+  transition: width 0.35s ease;
+}
+
+.loading-percent {
+  margin-top: 8px;
+  font-weight: 700;
+  color: #145a32;
+}
+
+.badge-ok,
+.badge-warn,
+.badge-neutral {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.badge-ok {
+  background: #def7e8;
+  color: #175230;
+}
+
+.badge-warn {
+  background: #ffe7e7;
+  color: #7a1f1f;
+}
+
+.badge-neutral {
+  background: #e9eff2;
+  color: #334a57;
+}
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid #d9e7de;
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
